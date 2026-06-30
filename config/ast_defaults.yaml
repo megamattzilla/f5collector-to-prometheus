@@ -47,7 +47,7 @@ bigip_receiver_defaults:
   # The TLS settings to use. Either a CA file must be specified or insecure_skip_verify
   # set to true (not recommended)
   tls:
-    insecure_skip_verify: false
+    insecure_skip_verify: true
     ca_file: ""
 
 # Set to true to enable periodic metric export to F5 DataFabric.
