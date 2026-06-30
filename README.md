@@ -8,7 +8,7 @@ Follows similar setup as https://f5devcentral.github.io/application-study-tool/g
 
 Suggested setup: 
 
-```
+```bash
 # Clone the repo
 git clone https://github.com/megamattzilla/f5collector-to-prometheus.git
 cd f5collector-to-prometheus
