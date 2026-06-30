@@ -4,7 +4,32 @@ simplified AST/otel collector to prometheus scrape endpoint
 Forked from https://github.com/f5devcentral/application-study-tool/tree/9.8 
 
 # Otel Collector Setup
-Follows same setup as https://f5devcentral.github.io/application-study-tool/getting_started.html#installation 
+Follows similar setup as https://f5devcentral.github.io/application-study-tool/getting_started.html#installation minus a few commands. 
+
+Suggested setup: 
+
+```bash
+# Clone the repo
+git clone https://github.com/megamattzilla/f5collector-to-prometheus.git
+cd f5collector-to-prometheus
+
+# Edit the following file with device secrets as required (see "Configure Device Secrets" below)
+cp .env.device-secrets-example .env.device-secrets
+
+# Edit the default settings for your environment as required
+# (see "Configure Default Device Settings" below)
+vi ./config/ast_defaults.yaml
+
+# Edit the config file with device / connection info
+# (see "Configure Devices To Scrape" below)
+vi ./config/bigip_receivers.yaml
+
+# Run the configuration generator
+docker run --rm -it -w /app -v ${PWD}:/app --entrypoint /app/src/bin/init_entrypoint.sh python:3.12.6-slim-bookworm --generate-config
+
+# Start the tool
+docker compose up
+```
 
 # Prometheus setup
 Point your prometheus instance to this host IP address on port 9099 
