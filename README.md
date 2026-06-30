@@ -1,16 +1,32 @@
 # f5collector-to-prometheus
-simplified AST/otel collector to prometheus scrape endpoint 
+Simplified AST/otel collector to prometheus scrape endpoint. 
 
-Forked from https://github.com/f5devcentral/application-study-tool/tree/9.8 
+Forked from [f5devcentral/application-study-tool (branch 9.8)](https://github.com/f5devcentral/application-study-tool/tree/9.8)
 
-# Otel Collector Setup
-Follows similar setup as https://f5devcentral.github.io/application-study-tool/getting_started.html#installation minus a few commands. 
+## Architecture Enhancements
+
+### Why Sharding was Added
+Because the F5 OpenTelemetry collector actively reaches out to poll BIG-IPs (a pull-based telemetry model), all Big-IP metrics would be output to a single prometheus exporter, which in turn will create a huge /metrics endpoint for prometheus to query. 
+
+**Configuration-Based Sharding** solves this. By passing the `--shards X` flag to the initialization script, the system automatically:
+1. Distributes your configured BIG-IP targets evenly across multiple distinct `receivers.yaml` files.
+2. Generates a `docker-compose.override.yaml` file to dynamically spin up dedicated pairs of scrapers and exporters.
+3. Maps each pair to a unique host port (e.g., `9091`, `9092`, `9093`), ensuring external Prometheus instances scrape a cleanly distributed, deduplicated metrics pipeline.
+
+### Batch Processing Improvements
+BIG-IPs can generate massive payloads of telemetry data. Pushing these metrics downstream on a per-event basis causes high CPU utilization and network overhead. The pipeline now utilizes the OpenTelemetry `batch` processor to aggregate data before export. By enforcing explicit `send_batch_size`, `send_batch_max_size`, and timeouts, the collector chunks the F5 data into optimized payloads, improving memory stability and dramatically reducing network congestion to the Prometheus exporter.
+
+---
+
+## Otel Collector Setup
+Follows a similar setup as the [AST Getting Started Guide](https://f5devcentral.github.io/application-study-tool/getting_started.html#installation) minus a few commands. 
 
 Suggested setup: 
 
 ```bash
 # Clone the repo
 git clone https://github.com/megamattzilla/f5collector-to-prometheus.git
+git checkout testing
 cd f5collector-to-prometheus
 
 # Edit the following file with device secrets as required (see "Configure Device Secrets" below)
@@ -29,34 +45,3 @@ docker run --rm -it -w /app -v ${PWD}:/app --entrypoint /app/src/bin/init_entryp
 
 # Start the tool
 docker compose up -d
-```
-
-## Validation
-Once the F5 otel collector is pushing metrics to the generic otel collector via OTLP, you can query the prometheus /metrics endpoint:  
-`curl localhost:9099/metrics` 
-
-# Prometheus setup
-Point your prometheus instance to this host IP address on port 9099 
-
-Recommended scrape configs to restore label mapping when using a prometheus exporter: 
-
-```
-scrape_configs:
-  - job_name: 'otel-exporter'
-    scrape_interval: 1m
-    static_configs:
-      - targets: ['otel-collector-prom-exporter:9099']
-    metric_relabel_configs:
-    # copy exported_instance value to label instance
-    - source_labels: [exported_instance]
-      target_label: instance
-    # remove exported_instance label
-    - action: labeldrop
-      regex: ^exported_instance$
-    # copy exported_instance value to label job
-    - source_labels: [exported_job]
-      target_label: job
-    # remove exported_instance label
-    - action: labeldrop
-      regex: ^exported_job$
-```
