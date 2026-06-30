@@ -9,7 +9,7 @@ processors:
 exporters:
   ## Set generic otel collector as OTLP endpoint for bigip-scraper to send metrics to
   otlp/otel-prometheus-exporter:
-    endpoint: otel-collector-prom-exporter:4317
+    endpoint: ${env:OTLP_TARGET_ENDPOINT}
     tls:
       insecure: true
   debug/bigip:
