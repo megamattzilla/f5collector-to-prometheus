@@ -1,0 +1,34 @@
+services:
+  otel-collector:
+    # ghcr.io/f5devcentral/application-study-tool/otel_custom_collector:v0.9.6
+    image: ghcr.io/f5devcentral/application-study-tool/otel_custom_collector@sha256:47000e10d93934f680760a8b65863227335e5ec9cb7fa9f24ea4d5db2dff0a3d
+    restart: unless-stopped
+    volumes:
+      - ./services/otel_collector:/etc/otel-collector-config
+    command:
+      - "--config=/etc/otel-collector-config/defaults/bigip-scraper-config.yaml"
+    env_file:
+      - ".env"
+      - ".env.device-secrets"
+    networks:
+      - 7lc_network
+
+## Adding Generic Otel collector to perform otlp (grpc) to prometheus export (/metrics endpoint) 
+  otel-collector-prom-exporter:
+    image: otel/opentelemetry-collector-contrib:0.115.1
+    restart: unless-stopped
+    ports:
+      - 9099:9099
+      - 4317:4317
+    volumes:
+      - ./services/generic_otel_collector:/etc/otel-collector-config
+    command:
+      - "--config=/etc/otel-collector-config/defaults/prometheus-exporter-config.yaml"
+    env_file:
+      - ".env"
+      - ".env.device-secrets"
+    networks:
+      - 7lc_network
+
+networks:
+  7lc_network:

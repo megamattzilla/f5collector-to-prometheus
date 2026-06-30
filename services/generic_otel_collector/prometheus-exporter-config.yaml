@@ -1,0 +1,23 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: "${env:HOSTNAME}:4317"
+        #Allow large data push from f5 collector
+        max_recv_msg_size_mib: 100
+
+exporters:
+  debug:
+    verbosity: basic
+    sampling_initial: 5
+    sampling_thereafter: 200
+  prometheus:
+    endpoint: "0.0.0.0:9099"
+    resource_to_telemetry_conversion:
+      enabled: false
+
+service:
+  pipelines:
+    metrics:
+      receivers: [otlp]
+      exporters: [debug, prometheus]

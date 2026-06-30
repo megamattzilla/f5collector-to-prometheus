@@ -1,0 +1,8 @@
+metrics/local:
+  exporters:
+  - otlp/otel-prometheus-exporter
+  - debug/bigip
+  processors:
+  - batch/local
+  receivers:
+  - bigip/1
