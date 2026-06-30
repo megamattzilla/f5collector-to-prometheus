@@ -14,7 +14,7 @@ services:
 
 ## Adding Generic Otel collector to perform otlp (grpc) to prometheus export (/metrics endpoint) 
   otel-collector-prom-exporter:
-    image: otel/opentelemetry-collector-contrib:0.115.1
+    image: otel/opentelemetry-collector-contrib:0.155.0
     restart: unless-stopped
     ports:
       - 9099:9099

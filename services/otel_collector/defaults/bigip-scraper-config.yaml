@@ -2,6 +2,9 @@ receivers: ${file:/etc/otel-collector-config/receivers.yaml}
 
 processors:
   batch/local:
+    send_batch_size: 4000
+    send_batch_max_size: 5000
+    timeout: 1s
 
 exporters:
   ## Set generic otel collector as OTLP endpoint for bigip-scraper to send metrics to
