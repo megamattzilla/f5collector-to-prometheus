@@ -83,3 +83,28 @@ pipelines:
     #receivers list are generated via the config helper script
     processors: [interval/f5-datafabric, attributes/f5-datafabric, batch/f5-datafabric]
     exporters: [otlp/f5-datafabric, debug/bigip]
+
+# ---------------------------------------------------------
+# Docker Compose Sharding Templates
+# ---------------------------------------------------------
+# These act as the base definition for the generated docker-compose.override.yaml.
+# The python script will automatically append the required environment variables, 
+# volumes, and port mappings needed for sharding.
+docker_compose_defaults:
+# The starting port for the Prometheus exporters. 
+  # Shard 1 will use this + 1 (e.g., 9091), Shard 2 will use + 2 (e.g., 9092), etc.
+  exporter_port_start: 9090
+  
+  scraper_base:
+    image: "ghcr.io/f5devcentral/application-study-tool/otel_custom_collector@sha256:47000e10d93934f680760a8b65863227335e5ec9cb7fa9f24ea4d5db2dff0a3d"
+    restart: "unless-stopped"
+    command: ["--config=/etc/otel-collector-config/defaults/bigip-scraper-config.yaml"]
+    env_file: [".env.device-secrets"]
+    networks: ["7lc_network"]
+
+  exporter_base:
+    image: "otel/opentelemetry-collector-contrib:0.155.0"
+    restart: "unless-stopped"
+    command: ["--config=/etc/otel-collector-config/defaults/prometheus-exporter-config.yaml"]
+    env_file: [".env.device-secrets"]
+    networks: ["7lc_network"]    

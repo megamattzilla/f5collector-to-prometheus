@@ -24,8 +24,8 @@ vi ./config/ast_defaults.yaml
 # (see "Configure Devices To Scrape" below)
 vi ./config/bigip_receivers.yaml
 
-# Run the configuration generator
-docker run --rm -it -w /app -v ${PWD}:/app --entrypoint /app/src/bin/init_entrypoint.sh python:3.12.6-slim-bookworm --generate-config
+# Run the configuration generator with desired number of shards (pairs of f5 otel and generic otel containers)
+docker run --rm -it -w /app -v ${PWD}:/app --entrypoint /app/src/bin/init_entrypoint.sh python:3.12.6-slim-bookworm --generate-config --shards 4 
 
 # Start the tool
 docker compose up -d
