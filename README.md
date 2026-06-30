@@ -3,7 +3,7 @@ simplified AST/otel collector to prometheus scrape endpoint
 
 Forked from https://github.com/f5devcentral/application-study-tool/tree/9.8 
 
-# Setup
+# Otel Collector Setup
 Follows same setup as https://f5devcentral.github.io/application-study-tool/getting_started.html#installation 
 
 # Prometheus setup
