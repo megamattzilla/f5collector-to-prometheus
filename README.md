@@ -8,7 +8,7 @@ Follows similar setup as https://f5devcentral.github.io/application-study-tool/g
 
 Suggested setup: 
 
-```bash
+```
 # Clone the repo
 git clone https://github.com/megamattzilla/f5collector-to-prometheus.git
 cd f5collector-to-prometheus
@@ -28,8 +28,12 @@ vi ./config/bigip_receivers.yaml
 docker run --rm -it -w /app -v ${PWD}:/app --entrypoint /app/src/bin/init_entrypoint.sh python:3.12.6-slim-bookworm --generate-config
 
 # Start the tool
-docker compose up
+docker compose up -d
 ```
+
+## Validation
+Once the F5 otel collector is pushing metrics to the generic otel collector via OTLP, you can query the prometheus /metrics endpoint:  
+`curl localhost:9099/metrics` 
 
 # Prometheus setup
 Point your prometheus instance to this host IP address on port 9099 

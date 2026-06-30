@@ -8,7 +8,6 @@ services:
     command:
       - "--config=/etc/otel-collector-config/defaults/bigip-scraper-config.yaml"
     env_file:
-      - ".env"
       - ".env.device-secrets"
     networks:
       - 7lc_network
@@ -25,7 +24,6 @@ services:
     command:
       - "--config=/etc/otel-collector-config/defaults/prometheus-exporter-config.yaml"
     env_file:
-      - ".env"
       - ".env.device-secrets"
     networks:
       - 7lc_network
